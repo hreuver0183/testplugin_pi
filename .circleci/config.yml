@@ -6,52 +6,16 @@ parameters:
         type: boolean
         default: true
 
-    run_build_armhf_stretch:
-        type: boolean
-        default: true
     run_build_armhf_buster:
         type: boolean
         default: true
-    run_build_armhf_bionic_64:
+    run_build_arm64_bionic:
         type: boolean
         default: true
-    run_build_trusty:
-        type: boolean
-        default: true
-    run_build_xenial:
-        type: boolean
-        default: true
-    run_build_bionic:
-        type: boolean
-        default: true
-    run_build_bionic_gtk3:
-        type: boolean
-        default: true
-    run_build_focal:
+    run_build_arm64_focal:
         type: boolean
         default: true
     run_build_focal_gtk3:
-        type: boolean
-        default: true
-    run_build_buster:
-        type: boolean
-        default: true
-    run_build_flatpack:
-        type: boolean
-        default: true
-    run_build_fedora:
-        type: boolean
-        default: true
-    run_build_mingw:
-        type: boolean
-        default: true
-    run_build_macos:
-        type: boolean
-        default: true
-    run_build_android_arm64:
-        type: boolean
-        default: true
-    run_build_android_armhf:
         type: boolean
         default: true
 
@@ -90,7 +54,7 @@ jobs:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
             - run: ci/cloudsmith-upload.sh
-    build-armhf-bionic-64:
+    build-arm64-bionic:
         machine: true
         environment:
         - OCPN_TARGET=bionic-arm64
@@ -102,7 +66,25 @@ jobs:
         - checkout
         - run: chmod a+x ./ci/*.sh
         - run:
-            command: ci/circleci-build-raspbian-armhf.sh
+            command: ci/circleci-build-ubuntu-arm64.sh
+            no_output_timeout: 30m
+        - when:
+            condition: <<pipeline.parameters.run_workflow_deploy>>
+            steps:
+            - run: ci/cloudsmith-upload.sh
+    build-arm64-focal:
+        machine: true
+        environment:
+        - OCPN_TARGET=bionic-arm64
+        - OCPN_BRANCH=master
+        - DOCKER_IMAGE=arm64v8/ubuntu:20.04
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=ubuntu
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-ubuntu-arm64.sh
             no_output_timeout: 30m
         - when:
             condition: <<pipeline.parameters.run_workflow_deploy>>
